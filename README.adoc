@@ -1,5 +1,17 @@
 = Notes
+:toc: auto
+
 
 Just some of my notes from research
 
 include::ComputerNetworks/dns_records.adoc[]
+
+include::ComputerNetworks/dns.adoc[]
+
+include::ComputerNetworks/readme.adoc[]
+
+include::hardware_security/cloud_computing_secrity.adoc[]
+
+include::hardware_security/hsm/readme.adoc[]
+
+include::SDR/readme.adoc[]
