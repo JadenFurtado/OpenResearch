@@ -1,0 +1,118 @@
+=== Introduction
+
+A hardware security module (HSM) is a physical computing device that safeguards and manages secrets (most importantly digital keys), performs encryption and decryption functions for digital signatures, strong authentication and other cryptographic functions.
+These modules traditionally come in the form of a plug-in card or an external device that attaches directly to a computer or network server. A hardware security module contains one or more secure cryptoprocessor chips.
+
+=== Design
+
+HSMs may have features that provide tamper evidence such as visible signs of tampering or logging and alerting, or tamper resistance which makes tampering difficult without making the HSM inoperable, or tamper responsiveness such as deleting keys upon tamper detection.[4] Each module contains one or more secure cryptoprocessor chips to prevent tampering and bus probing, or a combination of chips in a module that is protected by the tamper evident, tamper resistant, or tamper responsive packaging.
+
+
+.A networked HSM
+image::https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Atalla_HSM.jpg/220px-Atalla_HSM.jpg[]
+
+A vast majority of existing HSMs are designed mainly to manage secret keys. Many HSM systems have means to securely back up the keys they handle outside of the HSM. Keys may be backed up in wrapped form and stored on a computer disk or other media, or externally using a secure portable device like a smartcard or some other security token.
+
+HSMs are used for real time authorization and authentication in critical infrastructure thus are typically engineered to support standard high availability models including clustering, automated failover, and redundant field-replaceable components.
+
+A few of the HSMs available in the market have the capability to execute specially developed modules within the HSM's secure enclosure. Such an ability is useful, for example, in cases where special algorithms or business logic has to be executed in a secured and controlled environment. 
+The modules can be developed in native C language, .NET, Java, or other programming languages. 
+Further, upcoming next-generation HSMs can handle more complex tasks such as loading and running full operating systems and COTS(commercial off-the-shelf software) software without requiring customization and reprogramming. 
+Such unconventional designs overcome existing design and performance limitations of traditional HSMs while providing the benefit of securing application-specific code. 
+These execution engines protect the status of an HSM's FIPS or Common Criteria validation.
+
+=== Uses
+
+A hardware security module can be employed in any application that uses digital keys. Typically, the keys would be of high value - meaning there would be a significant, negative impact to the owner of the key if it were compromised.
+
+The functions of an HSM are:
+
+* onboard secure cryptographic key generation
+* onboard secure cryptographic key storage, at least for the top level and most sensitive keys, which are often called master keys
+key management
+* use of cryptographic and sensitive data material, for example, performing decryption or digital signature functions
+* offloading application servers for complete asymmetric and symmetric cryptography.
+
+HSMs are also deployed to manage transparent data encryption keys for databases and keys for storage devices such as disk or tape.
+
+HSMs provide both logical and physical protection of these materials, including cryptographic keys, from disclosure, non-authorized use, and potential adversaries.
+
+HSMs support both symmetric and asymmetric (public-key) cryptography. 
+For some applications, such as certificate authorities and digital signing, the cryptographic material is asymmetric key pairs (and certificates) used in public-key cryptography
+With other applications, such as data encryption or financial payment systems, the cryptographic material consists mainly of symmetric keys.
+
+Some HSM systems are also hardware cryptographic accelerators. 
+They usually cannot beat the performance of hardware-only solutions for symmetric key operations. 
+However, with performance ranges from 1 to 10,000 1024-bit RSA signs per second, HSMs can provide significant CPU offload for asymmetric key operations. Since the National Institute of Standards and Technology (NIST) is recommending the use of 2,048 bit RSA keys from year 2010, performance at longer key sizes has become more important. To address this issue, most HSMs now support elliptic curve cryptography (ECC), which delivers stronger encryption with shorter key lengths.
+PKI environment (CA HSMs)
+
+In PKI environments, the HSMs may be used by certification authorities (CAs) and registration authorities (RAs) to generate, store, and handle asymmetric key pairs. In these cases, there are some fundamental features a device must have, namely:
+
+* Logical and physical high-level protection
+* Multi-part user authorization schema (see secret sharing)
+* Full audit and log traces
+* Secure key backup
+
+On the other hand, device performance in a PKI environment is generally less important, in both online and offline operations, as Registration Authority procedures represent the performance bottleneck of the Infrastructure.
+
+==== Card payment system HSMs (bank HSMs)
+
+Specialized HSMs are used in the payment card industry. HSMs support both general-purpose functions and specialized functions required to process transactions and comply with industry standards. They normally do not feature a standard API.
+
+Typical applications are transaction authorization and payment card personalization, requiring functions such as:
+
+* verify that a user-entered PIN matches the reference PIN known to the card issuer
+* verify credit/debit card transactions by checking card security codes or by performing host processing components of an EMV based transaction in conjunction with an ATM controller or POS terminal
+* support a crypto-API with a smart card (such as an EMV)
+* re-encrypt a PIN block to send it to another authorization host
+* perform secure key management
+* support a protocol of POS ATM network management
+* support de facto standards of host-host key | data exchange API
+* generate and print a "PIN mailer"
+* generate data for a magnetic stripe card (PVV, CVV)
+* generate a card keyset and support the personalization process for smart cards
+
+The major organizations that produce and maintain standards for HSMs on the banking market are the Payment Card Industry Security Standards Council, ANS X9, and ISO.
+
+==== SSL connection establishment
+
+Performance-critical applications that have to use HTTPS (SSL/TLS), can benefit from the use of an SSL Acceleration HSM by moving the RSA operations, which typically requires several large integer multiplications, from the host CPU to the HSM device. Typical HSM devices can perform about 1 to 10,000 1024-bit RSA operations/second. 
+Some performance at longer key sizes is becoming increasingly important. To address this issue, some HSMs now support ECC.
+Specialized HSM devices can reach numbers as high as 20,000 operations per second.
+
+==== DNSSEC
+
+An increasing number of registries use HSMs to store the key material that is used to sign large zonefiles. OpenDNSSEC is an open-source tool that manages signing DNS zone files.
+
+On January 27, 2007, ICANN and Verisign, with support from the U.S. Department of Commerce, started deploying DNSSEC for DNS root zones. Root signature details can be found on the Root DNSSEC's website.
+
+==== Blockchain and HSMs
+
+Blockchain technology depends on cryptographic operations. Safeguarding private keys is essential to maintain the security of blockchain processes that utilize asymmetric cryptography.
+
+The synergy between HSMs and blockchain is mentioned in several papers, emphasizing their role in securing private keys and verifying identity, e.g. in contexts such as blockchain-driven mobility solutions.
+
+Cryptographic operations performed by Fabric nodes in the Hyperledger framework support delegation to a Hardware Security Module.
+
+==== Cryptocurrency wallet
+Cryptocurrency private keys can be stored in a cryptocurrency wallet on a HSM.
+
+=== Degrees of Security
+
+Secure cryptoprocessors, while useful, are not invulnerable to attack, particularly for well-equipped and determined opponents (e.g. a government intelligence agency) who are willing to expend enough resources on the project.
+
+One attack on a secure cryptoprocessor targeted the IBM 4758. A team at the University of Cambridge reported the successful extraction of secret information from an IBM 4758, using a combination of mathematics, and special-purpose codebreaking hardware. However, this attack was not practical in real-world systems because it required the attacker to have full access to all API functions of the device. Normal and recommended practices use the integral access control system to split authority so that no one person could mount the attack.
+
+While the vulnerability they exploited was a flaw in the software loaded on the 4758, and not the architecture of the 4758 itself, their attack serves as a reminder that a security system is only as secure as its weakest link: the strong link of the 4758 hardware was rendered useless by flaws in the design and specification of the software loaded on it.
+
+Smartcards are significantly more vulnerable, as they are more open to physical attack. Additionally, hardware backdoors can undermine security in smartcards and other cryptoprocessors unless investment is made in anti-backdoor design methods.
+
+In the case of full disk encryption applications, especially when implemented without a boot PIN, a cryptoprocessor would not be secure against a cold boot attack if data remanence could be exploited to dump memory contents after the operating system has retrieved the cryptographic keys from its TPM.
+
+However, if all of the sensitive data is stored only in cryptoprocessor memory and not in external storage, and the cryptoprocessor is designed to be unable to reveal keys or decrypted or unencrypted data on chip bonding pads or solder bumps, then such protected data would be accessible only by probing the cryptoprocessor chip after removing any packaging and metal shielding layers from the cryptoprocessor chip. This would require both physical possession of the device as well as skills and equipment beyond that of most technical personnel.
+
+Other attack methods involve carefully analyzing the timing of various operations that might vary depending on the secret value or mapping the current consumption versus time to identify differences in the way that '0' bits are handled internally vs. '1' bits. Or the attacker may apply temperature extremes, excessively high or low clock frequencies or supply voltage that exceeds the specifications in order to induce a fault. The internal design of the cryptoprocessor can be tailored to prevent these attacks.
+
+Some secure crypto-processors contain dual processor cores and generate inaccessible encryption keys when needed so that even if the circuitry is reverse engineered, it will not reveal any keys that are necessary to securely decrypt software booted from encrypted flash memory or communicated between cores.
+
+The first single-chip cryptoprocessor design was for copy protection of personal computer software (see US Patent 4,168,396, Sept 18, 1979) and was inspired by Bill Gates's Open Letter to Hobbyists. 

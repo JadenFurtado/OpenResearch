@@ -1,0 +1,75 @@
+== DNS record types
+
+The following are the five major DNS record types:
+
+A record
+AAAA record
+CNAME record
+Nameserver (NS) record
+Mail exchange (MX) record
+
+The use for each of the above types varies. So let's look at more details about each DNS record type.
+1. A record
+
+The A record is the most important DNS record type. The "A" in A record stands for "address." An A record shows the IP address for a specific hostname or domain. For example, a DNS record lookup for the domain example.com returns the following result:
+Fig. 1: DNS record lookup result. Fig. 1: DNS record lookup result.
+
+From figure 1 above, we can see that the current IP address is 93.184.216.34. The A record only supports IPV4 addresses. Later in this post, we'll see how to point a domain to an IPV6 address using another DNS record type.
+Use of a record
+
+The main use of A record is for IP address lookup. Using an A record, a web browser is able to load a website using the domain name. As a result, we can access websites on the internet without knowing their IP addresses.
+
+Another use of A record is in the domain name system-based blackhole list (DNSBL). Here, the A record is used to block mail from known spam sources.
+2. AAAA record
+
+AAAA record, just like A record, point to the IP address for a domain. However, this DNS record type is different in the sense that it points to IPV6 addresses.
+
+IPV6 is an upgrade over IPV4 as it offers more IP addresses. As a result, IPV6 solves the issue of running out of unique IP addresses. An IPV6 address looks something like the following:
+
+3001:0db7:3c5d:0024:0000:0000:1a2f:3c1b
+
+A colon separates each field in an IPV6 address.
+Use of AAAA record
+
+Usage of the AAAA record for DNS resolution has great potential because it uses IPV6, which is an improvement over IPV4. Also, as the internet keeps growing and we're running out of IPV4 addresses, the potential for AAAA records is high.
+
+AAAA records are used to resolve a domain name to the newer IPV6 protocol address.
+3. CNAME record
+
+CNAME—or, in full, "canonical name"—is a DNS record that points a domain name (an alias) to another domain. In a CNAME record, the alias doesn't point to an IP address. And the domain name that the alias points to is the canonical name. For example, the subdomain ng.example.com can point to example.com using CNAME. Here example.com points to the actual IP address using an A record.
+Use of CNAME record
+
+A practical example for the use of CNAME records is running multiple subdomains for different purposes on the same server. For example, we can use ftp.example.com for file transfer protocol (FTP) and serve webpages via www.example.com. We can then use a CNAME record to point both subdomains to example.com. The main domain example.com then points to the server's IP address using an A record.
+
+It's also possible to point a CNAME to another CNAME. However, doing so is inefficient and can lead to slow load speed and poor user experience.
+4. NS record
+
+A nameserver (NS) record specifies the authoritative DNS server for a domain. In other words, the NS record helps point to where internet applications like a web browser can find the IP address for a domain name. Usually, multiple nameservers are specified for a domain. For example, these could look like ns1.examplehostingprovider.com and ns2.examplehostingprovider.com.
+Use of NS record
+
+If you've purchased a web hosting service or set up a simple website, you probably received an email with nameserver details. Those nameservers, in simple terms, connect your domain name to the actual server your site is hosted on. The nameserver contains other DNS records for the domain like an A record and MX record.
+5. MX record
+
+A mail exchange (MX) record, is a DNS record type that shows where emails for a domain should be routed to. In other words, an MX record makes it possible to direct emails to a mail server.
+
+You can have multiple MX records for a single domain name. And what this means is that you can have backup email servers. The following shows an example of a domain with multiple MX records:
+Name 	Type 	​Priority 	RDATA
+@ 	MX 	10 	mx.zoho.com
+@ 	MX 	20 	mx2.zoho.com
+
+From the above table, the MX record with priority 10 will be the primary mail server, while the secondary server will only be used when the primary server is unavailable (or fails to send emails). The lower the priority value, the higher the actual priority.
+Use of MX record
+
+With an MX record, it's possible to hand off emails to a dedicated email server. For example, you can decide to leave all the trouble of setting up webmail on a server you own to a specialized email provider. This comes with many benefits, including custom email clients for reading and sending emails, and improved security and spam filters. Also, you can use a service like Site24x7 to monitor and verify issues with the mail server your MX records point to.
+Other DNS record types
+
+In addition to the five DNS record types covered so far, here are some other record types:
+
+SOA record: SOA stands for "start of authority." It's an important DNS record type that stores admin information about a domain. This information includes the email address of the admin and when the domain was last updated.
+TXT record: TXT stands for "text," and this record type lets the owner of a domain store text values in the DNS. Several services use this record to verify ownership of a domain.
+PTR record: A pointer (PTR) record provides a domain name for reverse lookup. It's the opposite of an A record as it provides the domain name linked to an IP address instead of the IP address for a domain.
+SRV record: Using this DNS record type, it's possible to store the IP address and port for specific services.
+CERT record: This record type stores public keys certificates.
+DCHID: This DNS record type stores information related to dynamic host configuration protocol (DHCP).
+DNAME: The full meaning of DNAME is "delegation name." This record type works very similarly to CNAME; however, it points all the subdomains for the alias to the canonical domain name. That is, pointing the DNAME for secondsite.com to example.com will also apply to staff.secondsite.com and any other subdomain.
+
