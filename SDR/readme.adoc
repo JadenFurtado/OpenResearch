@@ -2,6 +2,51 @@
 
 === What is SDR?
 
+Software-defined radio (SDR) is a radio communication system where components that conventionally have been implemented in analog hardware (e.g. mixers, filters, amplifiers, modulators/demodulators, detectors, etc.) are instead implemented by means of software on a personal computer or embedded system. 
+While the concept of SDR is not new, the rapidly evolving capabilities of digital electronics render practical many processes which were once only theoretically possible.
+
+A basic SDR system may consist of a personal computer equipped with a sound card, or other analog-to-digital converter, preceded by some form of RF front end. Significant amounts of signal processing are handed over to the general-purpose processor, rather than being done in special-purpose hardware (electronic circuits). Such a design produces a radio which can receive and transmit widely different radio protocols (sometimes referred to as waveforms) based solely on the software used.
+
+Software radios have significant utility for the military and cell phone services, both of which must serve a wide variety of changing radio protocols in real time. 
+In the long term, software-defined radios are expected by proponents like the Wireless Innovation Forum to become the dominant technology in radio communications. SDRs, along with software defined antennas are the enablers of cognitive radio.
+
+=== Types of Modulations
+
+List of common digital modulation techniques
+
+The most common digital modulation techniques are:
+
+* Phase-shift keying (PSK)
+- Binary PSK (BPSK), using M=2 symbols
+- Quadrature PSK (QPSK), using M=4 symbols
+- 8PSK, using M=8 symbols
+- 16PSK, using M=16 symbols
+- Differential PSK (DPSK)
+- Differential QPSK (DQPSK)
+- Offset QPSK (OQPSK)
+- π/4–QPSK
+* Frequency-shift keying (FSK)
+- Audio frequency-shift keying (AFSK)
+- Multi-frequency shift keying (M-ary FSK or MFSK)
+- Dual-tone multi-frequency (DTMF)
+* Amplitude-shift keying (ASK)
+* On-off keying (OOK), the most common ASK form
+- M-ary vestigial sideband modulation, for example 8VSB
+* Quadrature amplitude modulation (QAM), a combination of PSK and ASK
+- Polar modulation like QAM a combination of PSK and ASK[citation needed]
+* Continuous phase modulation (CPM) methods
+- Minimum-shift keying (MSK)
+- Gaussian minimum-shift keying (GMSK)
+- Continuous-phase frequency-shift keying (CPFSK)
+* Orthogonal frequency-division multiplexing (OFDM) modulation
+- Discrete multitone (DMT), including adaptive modulation and bit-loading
+* Wavelet modulation
+* Trellis coded modulation (TCM), also known as Trellis modulation
+* Spread spectrum techniques
+- Direct-sequence spread spectrum (DSSS)
+- Chirp spread spectrum (CSS) according to IEEE 802.15.4a CSS uses pseudo-stochastic coding
+- Frequency-hopping spread spectrum (FHSS) applies a special scheme for channel release
+
 === What is AM?
 
 === What is FM?

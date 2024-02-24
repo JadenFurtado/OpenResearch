@@ -1,0 +1,103 @@
+= Namespaces
+:source-highlighter: rouge
+:toc: auto
+
+== Overview
+
+Namespaces are a feature of the Linux kernel that partition kernel resources such that one set of processes sees one set of resources, while another set of processes sees a different set of resources. 
+The feature works by having the same namespace for a set of resources and processes, but those namespaces refer to distinct resources. Resources may exist in multiple spaces. 
+Examples of such resources are process IDs, host-names, user IDs, file names, some names associated with network access, and Inter-process communication.
+
+image::https://blog.quarkslab.com/resources/2021-11-18-namespaces/r5PvRzu.png[]
+
+Namespaces are a fundamental aspect of containers in Linux.
+
+The term "namespace" is often used to denote a specific type of namespace (e.g. process ID) as well as for a particular space of names.
+
+A Linux system begins with a single namespace of each type, used by all processes. Processes can create additional namespaces and also join different namespaces.
+
+== Types of Namespaces
+
+Since kernel version 5.6, there are 8 kinds of namespaces. Namespace functionality is the same across all kinds: each process is associated with a namespace and can only see or use the resources associated with that namespace, and descendant namespaces where applicable. This way each process (or process group thereof) can have a unique view on the resources. Which resource is isolated depends on the kind of namespace that has been created for a given process group.
+
+=== Mount (mnt)
+
+Mount namespaces control mount points. Upon creation the mounts from the current mount namespace are copied to the new namespace, but mount points created afterwards do not propagate between namespaces (using shared subtrees, it is possible to propagate mount points between namespaces[4]).
+
+The clone flag used to create a new namespace of this type is CLONE_NEWNS - short for "NEW NameSpace". This term is not descriptive (it does not tell which kind of namespace is to be created) because mount namespaces were the first kind of namespace and designers did not anticipate there being any others.
+
+=== Process ID (pid)
+
+The PID namespace provides processes with an independent set of process IDs (PIDs) from other namespaces. PID namespaces are nested, meaning when a new process is created it will have a PID for each namespace from its current namespace up to the initial PID namespace. Hence the initial PID namespace is able to see all processes, albeit with different PIDs than other namespaces will see processes with.
+
+The first process created in a PID namespace is assigned the process ID number 1 and receives most of the same special treatment as the normal init process, most notably that orphaned processes within the namespace are attached to it. This also means that the termination of this PID 1 process will immediately terminate all processes in its PID namespace and any descendants.
+
+=== Network (net)
+
+Network namespaces virtualize the network stack. On creation, a network namespace contains only a loopback interface.
+
+Each network interface (physical or virtual) is present in exactly 1 namespace and can be moved between namespaces.
+
+Each namespace will have a private set of IP addresses, its own routing table, socket listing, connection tracking table, firewall, and other network-related resources.
+
+Destroying a network namespace destroys any virtual interfaces within it and moves any physical interfaces within it back to the initial network namespace.
+Inter-process Communication (ipc)
+
+IPC namespaces isolate processes from SysV style inter-process communication. This prevents processes in different IPC namespaces from using, for example, the SHM family of functions to establish a range of shared memory between the two processes. Instead, each process will be able to use the same identifiers for a shared memory region and produce two such distinct regions.
+
+=== UTS
+
+UTS (UNIX Time-Sharing) namespaces allow a single system to appear to have different host and domain names to different processes. "When a process creates a new UTS namespace ... the hostname and domain of the new UTS namespace are copied from the corresponding values in the caller's UTS namespace."
+
+==== User ID (user)
+
+User namespaces are a feature to provide both privilege isolation and user identification segregation across multiple sets of processes available since kernel 3.8. With administrative assistance it is possible to build a container with seeming administrative rights without actually giving elevated privileges to user processes. Like the PID namespace, user namespaces are nested and each new user namespace is considered to be a child of the user namespace that created it.
+
+A user namespace contains a mapping table converting user IDs from the container's point of view to the system's point of view. This allows, for example, the root user to have user id 0 in the container but is actually treated as user id 1,400,000 by the system for ownership checks. A similar table is used for group id mappings and ownership checks.
+
+To facilitate privilege isolation of administrative actions, each namespace type is considered owned by a user namespace based on the active user namespace at the moment of creation. A user with administrative privileges in the appropriate user namespace will be allowed to perform administrative actions within that other namespace type. For example, if a process has administrative permission to change the IP address of a network interface, it may do so as long as its own user namespace is the same as (or ancestor of) the user namespace that owns the network namespace. Hence the initial user namespace has administrative control over all namespace types in the system.
+
+=== Control group (cgroup) Namespace
+
+The cgroup namespace type hides the identity of the control group of which process is a member. A process in such a namespace, checking which control group any process is part of, would see a path that is actually relative to the control group set at creation time, hiding its true control group position and identity. This namespace type has existed since March 2016 in Linux 4.6.
+
+=== Time Namespace
+
+The time namespace allows processes to see different system times in a way similar to the UTS namespace. It was proposed in 2018 and landed on Linux 5.6, which was released in March 2020.
+
+== Proposed namespaces
+
+=== syslog namespace
+
+The syslog namespace was proposed by Rui Xiang, an engineer at Huawei, but wasn't merged into the linux kernel. systemd implemented a similar feature called “journal namespace” in February 2020. 
+
+== Implementation details
+
+```c
+struct upid {
+    int nr;  /* the pid value */
+    struct pid_namespace *ns;       /* the namespace this value
+                                    * is visible in */
+    struct hlist_node pid_chain; /* hash chain for faster search of PIDS in the given namespace*/
+};
+
+struct pid {
+    atomic_t count; /* reference counter */
+    struct hlist_head tasks[PIDTYPE_MAX]; /* lists of tasks */
+    struct rcu_head rcu;
+    int level;              // number of upids
+    struct upid numbers[0];  // array of pid namespaces
+};
+```
+
+=== Connecting a pair of namespaces
+
+In order to make a process inside a new network namespace reachable from another network namespace, a pair of virtual interfaces is needed. These two virtual interfaces come with a virtual cable - what comes at one of the ends goes to the other (like a Linux pipe). So if we want to connect a namespace (let’s say N1) and another one (let’s say N2) we have to put one of the virtual interfaces in the network stack of N1 and the other in the network stack of N2.
+
+image::https://blog.quarkslab.com/resources/2021-11-18-namespaces/2Bu1BeZ.png[]
+
+== References
+
+[1] https://en.wikipedia.org/wiki/Linux_namespaces[Linux namespaces wikipedia]
+[2] https://man7.org/linux/man-pages/man7/namespaces.7.html[namespaces man-pages]
+[3] https://blog.quarkslab.com/digging-into-linux-namespaces-part-1.html[Quarklab digging through namespaces]
