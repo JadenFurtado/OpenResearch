@@ -90,14 +90,103 @@ struct pid {
 };
 ```
 
+
+```cpp
+#define _GNU_SOURCE
+#include <sched.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <signal.h>
+#include <sys/wait.h>
+
+static char child_stack[10000];
+
+
+static int child_function(void * arg){
+    char *cmd[] = {(char *)arg, NULL};
+    execvp(cmd[0],cmd);
+    perror("execvp");
+    return 1;
+}
+
+
+int main(int argc, char *argv[]){
+    if(argc < 2){
+        fprintf(stderr,"Usage: %s <cmd>\n",argv[0]);
+        exit(EXIT_FAILURE);
+    }
+
+    int flags = SIGCHILD | CLONE_NEWPID;
+
+    pid_t child_pid = clone(child_function,child_stack+sizeof(child_stack),flags,argv[1]);
+    if(child_pid<0){
+        perror("clone");
+        exit(EXIT_FAILURE)
+    }
+
+    waitpid(child_pid,NULL,0);
+    return 0;
+}
+```
+
 === Connecting a pair of namespaces
 
 In order to make a process inside a new network namespace reachable from another network namespace, a pair of virtual interfaces is needed. These two virtual interfaces come with a virtual cable - what comes at one of the ends goes to the other (like a Linux pipe). So if we want to connect a namespace (let’s say N1) and another one (let’s say N2) we have to put one of the virtual interfaces in the network stack of N1 and the other in the network stack of N2.
 
 image::https://blog.quarkslab.com/resources/2021-11-18-namespaces/2Bu1BeZ.png[]
 
+```bash
+# create network namespace
+cryptonite@cryptonite:~ $sudo ip netns add netnstest
+# check if creation was successful
+cryptonite@cryptonite:~ $ls /var/run/netns
+netnstest
+# check if we have the same configurations as before
+cryptonite@cryptonite:~ $sudo nsenter --net=/var/run/netns/netnstest /bin/bash
+root@cryptonite:/home/cryptonite# ip link
+1: lo: <LOOPBACK> mtu 65536 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+# create the virtual network interface pair on
+# the top of the network stack of the root namespace
+cryptonite@cryptonite:~ $sudo ip link add veth0 type veth peer name ceth0
+# check if the pair veth0-ceth0 was successfully created
+cryptonite@cryptonite:~ $ip link | tail -n 4
+8: ceth0@veth0: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether f6:1a:ee:9c:26:0c brd ff:ff:ff:ff:ff:ff
+9: veth0@ceth0: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether ae:4d:95:44:ab:39 brd ff:ff:ff:ff:ff:ff
+# put one of the interfaces in the previously created network namespace
+# and keep the other end in the root network namespace
+cryptonite@cryptonite:~ $sudo ip link set ceth0 netns netnstest
+cryptonite@cryptonite:~ $ip link
+...
+9: veth0@if8: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether ae:4d:95:44:ab:39 brd ff:ff:ff:ff:ff:ff link-netns netnstest
+# one of the interfaces vanished
+# turn on the interface and assign it an IP
+cryptonite@cryptonite:~ $sudo ip link set veth0 up
+cryptonite@cryptonite:~ $sudo ip addr add 172.12.0.11/24 dev veth0
+
+cryptonite@cryptonite:~ $sudo nsenter --net=/var/run/netns/netnstest /bin/bash
+root@cryptonite:/home/cryptonite# ip link
+1: lo: <LOOPBACK> mtu 65536 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+8: ceth0@if9: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether f6:1a:ee:9c:26:0c brd ff:ff:ff:ff:ff:ff link-netnsid 0
+root@cryptonite:/home/cryptonite# ip link set lo up
+root@cryptonite:/home/cryptonite# ip link set ceth0 up
+root@cryptonite:/home/cryptonite# ip addr add 172.12.0.12/24 dev ceth0
+root@cryptonite:/home/cryptonite# ip addr | grep ceth
+8: ceth0@if9: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000
+    inet 172.12.0.12/24 scope global ceth0
+```
+
+
+
 == References
 
 [1] https://en.wikipedia.org/wiki/Linux_namespaces[Linux namespaces wikipedia]
 [2] https://man7.org/linux/man-pages/man7/namespaces.7.html[namespaces man-pages]
 [3] https://blog.quarkslab.com/digging-into-linux-namespaces-part-1.html[Quarklab digging through namespaces]
+[4] https://github.com/araujo88/ez-docker/tree/main[Example implementation of Namespaces in c]
