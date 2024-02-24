@@ -1,8 +1,7 @@
-= Namespaces
 :source-highlighter: rouge
 :toc: auto
 
-== Overview
+== Namespaces
 
 Namespaces are a feature of the Linux kernel that partition kernel resources such that one set of processes sees one set of resources, while another set of processes sees a different set of resources. 
 The feature works by having the same namespace for a set of resources and processes, but those namespaces refer to distinct resources. Resources may exist in multiple spaces. 

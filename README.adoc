@@ -1,6 +1,6 @@
 = Notes
 :toc: auto
-
+:source-highlighter: rogue
 
 Just some of my notes from research
 
@@ -15,3 +15,5 @@ include::hardware_security/cloud_computing_secrity.adoc[]
 include::hardware_security/hsm/readme.adoc[]
 
 include::SDR/readme.adoc[]
+
+include::name-spaces/readme.adoc[]
